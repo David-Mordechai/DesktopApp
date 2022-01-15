@@ -1,6 +1,7 @@
 ﻿using System;
 using EmployeeManager.Core.DataProvider;
 using EmployeeManager.Core.Entities;
+using EmployeeManager.ViewModel.Command;
 
 namespace EmployeeManager.ViewModel;
 
@@ -13,7 +14,11 @@ public class EmployeeViewModel : ViewModelBase
     {
         _employee = employee;
         _employeeDataProvider = employeeDataProvider;
+
+        SaveCommand = new DelegateCommand(Save, () => CanSave);
     }
+
+    public DelegateCommand SaveCommand { get; set; }
 
     public string FirstName
     {
@@ -24,12 +29,25 @@ public class EmployeeViewModel : ViewModelBase
             _employee.FirstName = value;
             OnPropertyChanged();
             OnPropertyChanged(nameof(CanSave));
+
+            SaveCommand.RaiseCanExecuteChanged();
         }
     }
 
     public DateTimeOffset EntryDate
     {
         get => _employee.EntryDate;
+        set
+        {
+            if (_employee.EntryDate == value) return;
+            _employee.EntryDate = value;
+            OnPropertyChanged();
+        }
+    }
+
+    public DateTime EntryDateTime
+    {
+        get => _employee.EntryDate.DateTime;
         set
         {
             if (_employee.EntryDate == value) return;
